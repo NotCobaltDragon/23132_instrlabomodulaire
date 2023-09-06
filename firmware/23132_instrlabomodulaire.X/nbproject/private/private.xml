@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23130_instrlabomodulaire/firmware/src/RS485_Driver.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23130_instrlabomodulaire/firmware/src/system_config/default/framework/driver/spi/static/src/drv_spi_static_sys_queue.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23130_instrlabomodulaire/firmware/src/system_config/default/framework/driver/spi/static/src/drv_spi_static_tasks.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/src/app.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/src/system_config/default/system_interrupt.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/src/main.c</file>
         </group>
     </open-files>
 </project-private>

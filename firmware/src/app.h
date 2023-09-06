@@ -59,6 +59,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 
+#include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Driver.h"
+#include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Commands.h"
+#include "adc_driver.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -72,7 +76,7 @@ extern "C" {
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-
+#define ACK "ACK"
 // *****************************************************************************
 /* Application states
 
@@ -89,13 +93,18 @@ typedef enum
 	/* Application's state machine's initial state. */
 	APP_STATE_INIT=0,
 	APP_STATE_SERVICE_TASKS,
-  APP_STATE_WAIT,
-
+    APP_STATE_RECEIVE_COMMAND,
+    APP_STATE_SEND_COMMAND,
+    APP_STATE_WAIT,
 	/* TODO: Define states used by the application state machine. */
 
 } APP_STATES;
 
-
+typedef enum 
+{
+  DC_MODE = 0,
+  AC_MODE,
+} CURRENT_MODE;
 // *****************************************************************************
 /* Application Data
 
@@ -113,6 +122,19 @@ typedef struct
 {
     /* The application's current state */
     APP_STATES state;
+    uint8_t idValue;
+
+    bool needSendCommand;
+    bool canReceiveCommand;
+    bool cmdReadyToSend;
+
+    uint8_t receivedCommand;
+    uint8_t receivedParameter;
+
+    bool currentMode;
+
+    uint8_t valueVolt;
+    uint8_t valueVoltTenth;
 
     /* TODO: Define any additional data used by the application. */
 
@@ -201,13 +223,13 @@ void APP_Tasks( void );
 
 uint8_t GetID(void);
 
-void VoltmeterModeAC(void);
-void VoltmeterModeDC(void);
+uint8_t ExtractId(char rxBuffer);
+uint8_t ExtractCommand(char rxBuffer);
+uint8_t ExtractParameter(char rxBuffer);
 
-void VoltmeterGain1(void);
-void VoltmeterGain2(void);
-void VoltmeterGain3(void);
-void VoltmeterGainNone(void);
+void SetVoltmeterMode(uint8_t mode);
+void SetVoltmeterGain(uint8_t gain);
+
 
 
 #endif /* _APP_H */

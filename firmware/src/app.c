@@ -78,6 +78,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 APP_DATA appData;
 
+RS485_DATA rs485Data;
+
+CURRENT_MODE currentMode;
+
+char txBuffer[8];
+char rxBuffer[8];
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Functions
@@ -116,6 +123,11 @@ void APP_Initialize ( void )
 {
 	/* Place the App state machine in its initial state. */
 	appData.state = APP_STATE_INIT;
+	appData.idValue = 0;
+	appData.currentMode = AC_MODE;
+	appData.canReceiveCommand = true;
+	SetVoltmeterMode(0);
+	SetVoltmeterGain(appData.currentMode);
 
 	
 	/* TODO: Initialize your application's state machine and other
@@ -141,20 +153,105 @@ void APP_Tasks ( void )
 		/* Application's initial state. */
 		case APP_STATE_INIT:
 		{
+			Init_RS485(RECEIVING);
+
+			if(!DRV_USART_TransmitBufferIsFull(rs485Data.usartHandle))
+			DRV_USART_WriteByte(rs485Data.usartHandle, 'A');
+			DRV_TMR0_Start();
+
 			//Init ADC
-			//Init UART
 			//Init TMR
+			appData.idValue = GetID();
+			rs485Data.id = appData.idValue;
+			appData.state = APP_STATE_SERVICE_TASKS;
 			break;
 		}
 		case APP_STATE_SERVICE_TASKS:
 		{
-			//Check if command received
-			//Execute command
-			//Send back info to main module
+			if((!DRV_USART_ReceiverBufferIsEmpty(rs485Data.usartHandle))&&(appData.canReceiveCommand == true))
+			{
+				appData.state = APP_STATE_RECEIVE_COMMAND;
+			}
+			else if(appData.needSendCommand == true && appData.cmdReadyToSend == true)
+			{
+				appData.state = APP_STATE_SEND_COMMAND;
+			}
+			switch(appData.receivedCommand)
+			{
+				case E_CMD_IDQUESTION:
+					sprintf(txBuffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], 0);
+					break;
+				case E_CMD_VOLTMGAIN:
+				{
+					SetVoltmeterGain(appData.receivedParameter);
+					sprintf(txBuffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], appData.receivedParameter);
+					break;
+				}					
+				case E_CMD_VOLTMMODE:
+					SetVoltmeterMode(appData.receivedParameter);
+					sprintf(txBuffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], appData.receivedParameter);
+					break;
+				case E_CMD_VOLTMREAD:
+				{
+					switch(appData.currentMode)
+					{
+						case DC_MODE:
+							//Read ADC DC
+							//Make conversion
+							break;
+						case AC_MODE:
+							//Read ADC AC
+							//Make converion
+							break;
+						default:
+							break;
+					}
+					appData.valueVolt = 10;
+					appData.valueVoltTenth = 33;
 
-			appData.state = APP_STATE_WAIT;
+					sprintf(txBuffer, "ID%d%s%d.%d", rs485Data.id, cmdData[appData.receivedCommand], appData.valueVolt, appData.valueVoltTenth);
+				}
+				default:
+					break;
+			}
 			break;
 		}
+		case APP_STATE_RECEIVE_COMMAND:
+		{
+			LED2On();
+			LED3Off();
+
+			rxBuffer[0] = GetMessage(rxBuffer);
+
+			appData.receivedCommand = ExtractCommand(rxBuffer);
+
+			if(ExtractId(rxBuffer) == appData.idValue || appData.receivedCommand == E_CMD_IDQUESTION)
+			{
+				appData.receivedParameter = ExtractParameter(rxBuffer);
+
+				appData.cmdReadyToSend = false;
+				appData.canReceiveCommand = false;
+				appData.needSendCommand = true;
+			}
+			else
+			{
+				//clear receive buffer
+			}
+			appData.state = APP_STATE_SERVICE_TASKS;	
+			break;
+		}
+		case APP_STATE_SEND_COMMAND:
+		{
+			LED2Off();
+			LED3On();
+			RS485_Direction_Mode(SENDING);
+			appData.needSendCommand = SendMessage(txBuffer);
+			appData.canReceiveCommand = true;
+			RS485_Direction_Mode(RECEIVING);
+			appData.state = APP_STATE_SERVICE_TASKS;
+			break;
+		}
+
 		case APP_STATE_WAIT:
 		{
 			//Do nothing
@@ -181,43 +278,90 @@ uint8_t GetID()
 
     return idValue;
 }
-
-void VoltmeterModeAC()
+uint8_t ExtractId(char rxBuffer)
 {
-	Relay_ACOn();
+	uint8_t id;
+	char tempBuffer[3];
+
+	strncpy(tempBuffer, rxBuffer, 3);
+	id = atoi(tempBuffer);
+
+	return id;
 }
 
-void VoltmeterModeDC()
+
+uint8_t ExtractCommand(char rxBuffer)
 {
-	Relay_ACOff();
+	uint8_t commandPosition;
+	for(commandPosition = 0; commandPosition < NB_CMD; commandPosition++)
+	{
+		if(strcmp(cmdData[commandPosition], rxBuffer) == 0)
+		{
+			return commandPosition;
+		}
+	}
+	return E_CMD_ERROR;
 }
 
-void VoltmeterGain1()
+uint8_t ExtractParameter(char rxBuffer)
 {
-	Scale_2Off();
-	Scale_3Off();
-	Scale_1On();
+	//uint8_t startIndex = 6;
+	uint8_t parameter;
+	char tempChar[10];
+	tempChar[0] = rxBuffer;
+
+	//tempChar = tempChar[6];
+	parameter = tempChar[6] - '0';
+
+	/*while((rxBuffer[startIndex] >= '0') && (rxBuffer[startIndex] <= '9'))
+	{
+		
+		startIndex++;
+	}*/
+	return parameter;
 }
 
-void VoltmeterGain2()
+void SetVoltmeterMode(uint8_t mode)
 {
-	Scale_1Off();
-	Scale_3Off();
-	Scale_2On();
+	if(mode = DC_MODE)
+	{
+		Relay_ACOff();
+		appData.currentMode = DC_MODE;
+	}
+	else
+	{
+		Relay_ACOn();
+		appData.currentMode = AC_MODE;
+	}
 }
 
-void VoltmeterGain3()
+void SetVoltmeterGain(uint8_t gain)
 {
-	Scale_1Off();
-	Scale_2Off();
-	Scale_3On();
-}
-
-void VoltmeterGainNone()
-{
-	Scale_1Off();
-	Scale_2Off();
-	Scale_3Off();
+	switch(gain)
+	{
+		case 0:
+			Scale_1Off();
+			Scale_2Off();
+			Scale_3Off();
+			break;
+		case 1:
+			Scale_2Off();
+			Scale_3Off();
+			Scale_1On();
+			break;
+		case 2:
+			Scale_1Off();
+			Scale_3Off();
+			Scale_2On();
+			break;
+		case 3:
+			Scale_1Off();
+			Scale_2Off();
+			Scale_3On();
+			break;
+		default:
+			break;
+	}
 }
 
 /*******************************************************************************

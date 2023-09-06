@@ -81,8 +81,8 @@ extern "C" {
 // *****************************************************************************
 /* Clock System Service Configuration Options
 */
-#define SYS_CLK_FREQ                        48000000ul
-#define SYS_CLK_BUS_PERIPHERAL_1            48000000ul
+#define SYS_CLK_FREQ                        40000000ul
+#define SYS_CLK_BUS_PERIPHERAL_1            40000000ul
 #define SYS_CLK_UPLL_BEFORE_DIV2_FREQ       63999984ul
 #define SYS_CLK_CONFIG_PRIMARY_XTAL         8000000ul
 #define SYS_CLK_CONFIG_SECONDARY_XTAL       32768ul
@@ -101,14 +101,14 @@ extern "C" {
 #define SYS_PORT_B_LAT          0x0000
 #define SYS_PORT_B_ODC          0x0000
 #define SYS_PORT_B_CNPU         0x0000
-#define SYS_PORT_B_CNPD         0x0000
+#define SYS_PORT_B_CNPD         0x0200
 #define SYS_PORT_B_CNEN         0x0000
 
 #define SYS_PORT_C_ANSEL        0xFC07
 #define SYS_PORT_C_TRIS         0xFEC7
 #define SYS_PORT_C_LAT          0x0000
 #define SYS_PORT_C_ODC          0x0000
-#define SYS_PORT_C_CNPU         0x0000
+#define SYS_PORT_C_CNPU         0x0100
 #define SYS_PORT_C_CNPD         0x0000
 #define SYS_PORT_C_CNEN         0x0000
 
@@ -121,12 +121,29 @@ extern "C" {
 // Section: Driver Configuration
 // *****************************************************************************
 // *****************************************************************************
-// *****************************************************************************
+/*** Timer Driver Configuration ***/
+#define DRV_TMR_INTERRUPT_MODE             true
+
+/*** Timer Driver 0 Configuration ***/
+#define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_2
+#define DRV_TMR_INTERRUPT_SOURCE_IDX0       INT_SOURCE_TIMER_2
+#define DRV_TMR_INTERRUPT_VECTOR_IDX0       INT_VECTOR_T2
+#define DRV_TMR_ISR_VECTOR_IDX0             _TIMER_2_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX0     INT_PRIORITY_LEVEL1
+#define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX0 INT_SUBPRIORITY_LEVEL0
+#define DRV_TMR_CLOCK_SOURCE_IDX0           DRV_TMR_CLKSOURCE_INTERNAL
+#define DRV_TMR_PRESCALE_IDX0               TMR_PRESCALE_VALUE_256
+#define DRV_TMR_OPERATION_MODE_IDX0         DRV_TMR_OPERATION_MODE_16_BIT
+#define DRV_TMR_ASYNC_WRITE_ENABLE_IDX0     false
+#define DRV_TMR_POWER_STATE_IDX0            
+
+
+ // *****************************************************************************
 /* USART Driver Configuration Options
 */
 #define DRV_USART_INSTANCES_NUMBER                  1
 #define DRV_USART_CLIENTS_NUMBER                    1
-#define DRV_USART_INTERRUPT_MODE                    true
+#define DRV_USART_INTERRUPT_MODE                    false
 #define DRV_USART_BYTE_MODEL_SUPPORT                true
 #define DRV_USART_READ_WRITE_MODEL_SUPPORT          false
 #define DRV_USART_BUFFER_QUEUE_SUPPORT              false
@@ -146,19 +163,19 @@ extern "C" {
 // *****************************************************************************
 /*** Application Defined Pins ***/
 
-/*** Functions for MCU_DE pin ***/
-#define MCU_DEToggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
-#define MCU_DEOn() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
-#define MCU_DEOff() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
-#define MCU_DEStateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
-#define MCU_DEStateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, Value)
+/*** Functions for RS485_DE_ pin ***/
+#define RS485_DE_Toggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
+#define RS485_DE_On() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
+#define RS485_DE_Off() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
+#define RS485_DE_StateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9)
+#define RS485_DE_StateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, Value)
 
-/*** Functions for MCU_RE pin ***/
-#define MCU_REToggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
-#define MCU_REOn() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
-#define MCU_REOff() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
-#define MCU_REStateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
-#define MCU_REStateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8, Value)
+/*** Functions for RS485_RE_ pin ***/
+#define RS485_RE_Toggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
+#define RS485_RE_On() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
+#define RS485_RE_Off() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
+#define RS485_RE_StateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8)
+#define RS485_RE_StateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_8, Value)
 
 /*** Functions for LED1 pin ***/
 #define LED1Toggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_2)

@@ -82,7 +82,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 /*** DEVCFG2 ***/
 
 #pragma config FPLLIDIV =   DIV_2
-#pragma config FPLLMUL =    MUL_24
+#pragma config FPLLMUL =    MUL_20
 #pragma config FPLLODIV =   DIV_2
 #pragma config UPLLIDIV =   DIV_3
 #pragma config UPLLEN =     OFF
@@ -153,9 +153,10 @@ void SYS_Initialize ( void* data )
     /* Initialize ADC */
     DRV_ADC_Initialize();
 
-    sysObj.drvUsart0 = DRV_USART_Initialize(DRV_USART_INDEX_0, (SYS_MODULE_INIT *)NULL);
-    SYS_INT_VectorPrioritySet(INT_VECTOR_UART1, INT_PRIORITY_LEVEL1);
-    SYS_INT_VectorSubprioritySet(INT_VECTOR_UART1, INT_SUBPRIORITY_LEVEL0);
+    /*Initialize TMR0 */
+    DRV_TMR0_Initialize();
+ 
+     sysObj.drvUsart0 = DRV_USART_Initialize(DRV_USART_INDEX_0, (SYS_MODULE_INIT *)NULL);
 
     /* Initialize System Services */
     SYS_PORTS_Initialize();
