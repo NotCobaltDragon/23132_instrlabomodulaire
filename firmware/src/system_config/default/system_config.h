@@ -101,7 +101,7 @@ extern "C" {
 #define SYS_PORT_B_LAT          0x0000
 #define SYS_PORT_B_ODC          0x0000
 #define SYS_PORT_B_CNPU         0x0000
-#define SYS_PORT_B_CNPD         0x0200
+#define SYS_PORT_B_CNPD         0x03A0
 #define SYS_PORT_B_CNEN         0x0000
 
 #define SYS_PORT_C_ANSEL        0xFC07
@@ -109,7 +109,7 @@ extern "C" {
 #define SYS_PORT_C_LAT          0x0000
 #define SYS_PORT_C_ODC          0x0000
 #define SYS_PORT_C_CNPU         0x0100
-#define SYS_PORT_C_CNPD         0x0000
+#define SYS_PORT_C_CNPD         0x0240
 #define SYS_PORT_C_CNEN         0x0000
 
 
@@ -125,14 +125,14 @@ extern "C" {
 #define DRV_TMR_INTERRUPT_MODE             true
 
 /*** Timer Driver 0 Configuration ***/
-#define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_2
-#define DRV_TMR_INTERRUPT_SOURCE_IDX0       INT_SOURCE_TIMER_2
-#define DRV_TMR_INTERRUPT_VECTOR_IDX0       INT_VECTOR_T2
-#define DRV_TMR_ISR_VECTOR_IDX0             _TIMER_2_VECTOR
-#define DRV_TMR_INTERRUPT_PRIORITY_IDX0     INT_PRIORITY_LEVEL1
+#define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_1
+#define DRV_TMR_INTERRUPT_SOURCE_IDX0       INT_SOURCE_TIMER_1
+#define DRV_TMR_INTERRUPT_VECTOR_IDX0       INT_VECTOR_T1
+#define DRV_TMR_ISR_VECTOR_IDX0             _TIMER_1_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX0     INT_PRIORITY_LEVEL6
 #define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX0 INT_SUBPRIORITY_LEVEL0
 #define DRV_TMR_CLOCK_SOURCE_IDX0           DRV_TMR_CLKSOURCE_INTERNAL
-#define DRV_TMR_PRESCALE_IDX0               TMR_PRESCALE_VALUE_256
+#define DRV_TMR_PRESCALE_IDX0               TMR_PRESCALE_VALUE_1
 #define DRV_TMR_OPERATION_MODE_IDX0         DRV_TMR_OPERATION_MODE_16_BIT
 #define DRV_TMR_ASYNC_WRITE_ENABLE_IDX0     false
 #define DRV_TMR_POWER_STATE_IDX0            
@@ -205,12 +205,12 @@ extern "C" {
 #define LED4StateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_4)
 #define LED4StateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_4, Value)
 
-/*** Functions for Relay_AC pin ***/
-#define Relay_ACToggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
-#define Relay_ACOn() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
-#define Relay_ACOff() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
-#define Relay_ACStateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
-#define Relay_ACStateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4, Value)
+/*** Functions for Relay_AC_ pin ***/
+#define Relay_AC_Toggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
+#define Relay_AC_On() PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
+#define Relay_AC_Off() PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
+#define Relay_AC_StateGet() PLIB_PORTS_PinGetLatched(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4)
+#define Relay_AC_StateSet(Value) PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_4, Value)
 
 /*** Functions for Scale_3 pin ***/
 #define Scale_3Toggle() PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_A, PORTS_BIT_POS_9)

@@ -14,17 +14,14 @@
 #define ADC_RESOLUTION 1023	//10bits
 
 #define GAIN_R_DIVIDER 0.1
-#define GAIN_ATTENUATOR 0.15
+#define GAIN_ATTENUATOR 0.13
 
 #define VREF 3000 //voltage on VREF pin in [mV]
 
-#define GAIN_DC_1 0.1
-#define GAIN_DC_2
-#define GAIN_DC_3
-
-#define GAIN_AC_1 0.1
-#define GAIN_AC_2
-#define GAIN_AC_3
+#define GAIN1 1
+#define GAIN4 4
+#define GAIN16 16
+#define GAIN64 64
 
 // ---------- Structures ---------- //
 typedef struct

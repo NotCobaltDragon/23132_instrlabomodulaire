@@ -76,7 +76,11 @@ extern "C" {
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
+
 #define ACK "ACK"
+
+#define STATUS_LED_BLINK_SPEED 100 //value in [ms]
+#define ADC_SCAN_SPEED 10 //value in [ms]
 // *****************************************************************************
 /* Application states
 
@@ -94,6 +98,7 @@ typedef enum
 	APP_STATE_INIT=0,
 	APP_STATE_SERVICE_TASKS,
     APP_STATE_RECEIVE_COMMAND,
+    APP_STATE_APPLY_SETTINGS,
     APP_STATE_SEND_COMMAND,
     APP_STATE_WAIT,
 	/* TODO: Define states used by the application state machine. */
@@ -105,6 +110,14 @@ typedef enum
   DC_MODE = 0,
   AC_MODE,
 } CURRENT_MODE;
+
+typedef enum
+{
+    GAIN_1 = 0,
+    GAIN_4,
+    GAIN_16,
+    GAIN_64,
+} GAIN_SELECT;
 // *****************************************************************************
 /* Application Data
 
@@ -127,11 +140,13 @@ typedef struct
     bool needSendCommand;
     bool canReceiveCommand;
     bool cmdReadyToSend;
+    bool isUsartOpened;
 
     uint8_t receivedCommand;
     uint8_t receivedParameter;
 
     bool currentMode;
+    GAIN_SELECT gainSelect;
 
     uint8_t valueVolt;
     uint8_t valueVoltTenth;
@@ -221,14 +236,8 @@ void APP_Initialize ( void );
 
 void APP_Tasks( void );
 
-uint8_t GetID(void);
-
-uint8_t ExtractId(char rxBuffer);
-uint8_t ExtractCommand(char rxBuffer);
-uint8_t ExtractParameter(char rxBuffer);
-
-void SetVoltmeterMode(uint8_t mode);
-void SetVoltmeterGain(uint8_t gain);
+void SetVoltmeterMode(bool mode);
+void SetVoltmeterGain(GAIN_SELECT gain);
 
 
 

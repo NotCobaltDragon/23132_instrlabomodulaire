@@ -12,7 +12,7 @@
 
 void InitADC(void)
 {
-	//PLIB_ADC_InputScanMaskAdd(ADC_ID_1, ADC_SCAN_ADDRESS);
+	PLIB_ADC_InputScanMaskAdd(ADC_ID_1, ADC_SCAN_ADDRESS);
 	// Configure l'ADC en mode alterné
 	PLIB_ADC_ResultFormatSelect(ADC_ID_1, ADC_RESULT_FORMAT_INTEGER_16BIT);
 	//Mode alterné
@@ -22,11 +22,11 @@ void InitADC(void)
 
 	//la lecture des ADC est cadensée par le timer interne
 	PLIB_ADC_ConversionTriggerSourceSelect(ADC_ID_1, ADC_CONVERSION_TRIGGER_INTERNAL_COUNT);
-	PLIB_ADC_VoltageReferenceSelect(ADC_ID_1, ADC_REFERENCE_VDD_TO_AVSS);
+	PLIB_ADC_VoltageReferenceSelect(ADC_ID_1, ADC_REFERENCE_VREFPLUS_TO_AVSS);
 	PLIB_ADC_SampleAcquisitionTimeSet(ADC_ID_1, 0x1F);
 	PLIB_ADC_ConversionClockSet(ADC_ID_1, SYS_CLK_FREQ, 32);
 
-	//ADC fait 3 mesures par interruption (car 3 canaux utillisés) 
+	//ADC fait 3 mesures par interruption (car 3 canaux utillises) 
 	PLIB_ADC_SamplesPerInterruptSelect(ADC_ID_1, ADC_3SAMPLES_PER_INTERRUPT);
 	//active le scan en mode multiplexage des entrées AN
 	PLIB_ADC_MuxAInputScanEnable(ADC_ID_1);

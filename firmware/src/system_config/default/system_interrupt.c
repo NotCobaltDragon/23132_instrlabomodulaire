@@ -62,6 +62,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/common/sys_common.h"
 #include "app.h"
 #include "system_definitions.h"
+#include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Driver.h"
+
+extern RS485_DATA rs485Data;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -71,10 +74,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  
  
 
-void __ISR(_TIMER_2_VECTOR, ipl1AUTO) IntHandlerDrvTmrInstance0(void)
+void __ISR(_TIMER_1_VECTOR, ipl6AUTO) IntHandlerDrvTmrInstance0(void)
 {
-    LED1Toggle();
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    StatusLEDCallback();
+    MessageDataTimeoutCallback();
+    ADC_Callback();
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
 }
  /*******************************************************************************
  End of File
