@@ -1,8 +1,8 @@
 //-----------------------------------------------------------
 // File Name    : adc_driver.h                              |
-// Project Name : TP4 EIND Alimentation uC                  |
+// Project Name : 23132_instrlabomodulaire                  |
 // Version      : V1                                        |
-// Date         : 19.06.2023                                |
+// Date         : 11.09.2023                                |
 // Author       : Alexandre Steffen                         |
 //-----------------------------------------------------------
 #ifndef _ADC_DRIVER_H

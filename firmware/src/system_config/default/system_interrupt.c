@@ -64,7 +64,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Driver.h"
 
-extern RS485_DATA rs485Data;
+//extern RS485_DATA rs485Data;
 
 // *****************************************************************************
 // *****************************************************************************

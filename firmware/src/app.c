@@ -130,7 +130,7 @@ void APP_Initialize ( void )
 	appData.idValue = 0;
 	appData.receivedCommand = 0;
 	//appData.currentMode = DC_MODE;
-	appData.gainSelect = GAIN_64;
+	appData.gainSelect = GAIN_1;
 	appData.canReceiveCommand = true;
 }
 
@@ -160,7 +160,7 @@ void APP_Tasks ( void )
 			appData.isUsartOpened = Init_RS485(RECEIVING);
 
 			if(appData.isUsartOpened == false)
-				LED4On();
+				LED4On();	//Error LED
 
 			InitADC();
 
@@ -188,7 +188,7 @@ void APP_Tasks ( void )
 			LED2On();
 
 			GetMessage(rxBuffer);
-			sscanf(rxBuffer, "ID%u%3s%1s", &appData.idValue, receivedCommand, &receivedParameter);
+			sscanf(rxBuffer, "ID%u%3s%1s", &appData.idValue, receivedCommand, &receivedParameter); //Get individual parameters
 
 			if(appData.idValue == rs485Data.id)
 			{

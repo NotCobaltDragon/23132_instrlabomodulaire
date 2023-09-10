@@ -234,10 +234,17 @@ void APP_Initialize ( void );
     This routine must be called from SYS_Tasks() routine.
  */
 
-void APP_Tasks( void );
+void APP_Tasks(void);
+
+uint8_t GetID(void);
 
 void SetVoltmeterMode(bool mode);
+
 void SetVoltmeterGain(GAIN_SELECT gain);
+
+void StatusLEDCallback(void);
+
+void ADC_Callback(void);
 
 
 
