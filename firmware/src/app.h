@@ -58,9 +58,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
+#include "rs485_driver.h"
+#include "rs485_commands.h"
+#include "voltmeter_cmd.h"
 
-#include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Driver.h"
-#include "C:\microchip\harmony\v2_06\apps\2313_instrlabomodulaire\23130_instrlabomodulaire\firmware\src\RS485_Commands.h"
 #include "adc_driver.h"
 
 // DOM-IGNORE-BEGIN
@@ -76,8 +77,7 @@ extern "C" {
 // Section: Type Definitions
 // *****************************************************************************
 // *****************************************************************************
-
-#define ACK "ACK"
+#define DEFAULT_GAIN 1
 
 #define STATUS_LED_BLINK_SPEED 100 //value in [ms]
 #define ADC_SCAN_SPEED 10 //value in [ms]
@@ -98,7 +98,6 @@ typedef enum
 	APP_STATE_INIT=0,
 	APP_STATE_SERVICE_TASKS,
     APP_STATE_RECEIVE_COMMAND,
-    APP_STATE_APPLY_SETTINGS,
     APP_STATE_SEND_COMMAND,
     APP_STATE_WAIT,
 	/* TODO: Define states used by the application state machine. */
@@ -238,13 +237,24 @@ void APP_Tasks(void);
 
 uint8_t GetID(void);
 
-void SetVoltmeterMode(bool mode);
+void InitCommands(void);
 
-void SetVoltmeterGain(GAIN_SELECT gain);
+//void SetVoltmeterMode(bool mode);
+void SetVoltmeterMode(const char* cmdParameter);
+
+//void SetVoltmeterGain(GAIN_SELECT gain);
+void SetVoltmeterGain(const char* cmdParameter);
+
+void SetVoltmeterDefault(void);
+
+//void ReadVoltmeterValue(void);
+void ReadVoltmeterValue(const char* cmdParameter);
 
 void StatusLEDCallback(void);
 
 void ADC_Callback(void);
+
+void ErrorHandler(void);
 
 
 

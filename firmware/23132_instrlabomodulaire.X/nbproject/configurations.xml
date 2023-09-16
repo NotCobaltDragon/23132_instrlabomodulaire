@@ -34,8 +34,9 @@
         </logicalFolder>
         <itemPath>../src/app.h</itemPath>
         <itemPath>../src/adc_driver.h</itemPath>
-        <itemPath>../../../23130_instrlabomodulaire/firmware/src/RS485_Commands.h</itemPath>
-        <itemPath>../../../23130_instrlabomodulaire/firmware/src/RS485_Driver.h</itemPath>
+        <itemPath>../src/rs485_commands.h</itemPath>
+        <itemPath>../src/rs485_driver.h</itemPath>
+        <itemPath>../src/voltmeter_cmd.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -151,8 +152,8 @@
         <itemPath>../src/app.c</itemPath>
         <itemPath>../src/main.c</itemPath>
         <itemPath>../src/adc_driver.c</itemPath>
-        <itemPath>../../../23130_instrlabomodulaire/firmware/src/RS485_Commands.c</itemPath>
-        <itemPath>../../../23130_instrlabomodulaire/firmware/src/RS485_Driver.c</itemPath>
+        <itemPath>../src/rs485_commands.c</itemPath>
+        <itemPath>../src/rs485_driver.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="system" projectFiles="true">
