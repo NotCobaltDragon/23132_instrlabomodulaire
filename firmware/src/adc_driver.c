@@ -64,16 +64,3 @@ S_RawAdcValues ReadAllADC(void)
         
     return rawResult;
 }
-
-S_ConvertedAdcValues ConvertAdcValues(void)
-{
-	S_RawAdcValues rawValues;
-	S_ConvertedAdcValues convertedValues;
-
-	rawValues = ReadAllADC();
-
-	//Direct current conversion
-
-	//Alternative current conversion
-	return(convertedValues);
-}

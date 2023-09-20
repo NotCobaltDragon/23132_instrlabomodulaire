@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "system_definitions.h"
-//#include "rs485_commands.h"	//Will be deprecated
 
 #define DEFAULT_RS485_MODE RECEIVE
 
@@ -42,13 +41,6 @@ typedef enum
 	ID_7,
 }E_ID_MODULES;
 
-//typedef enum
-//{
-//	CMD_CORRECT = 0,
-//	CMD_NOT_RECEIVED,
-//	CMD_WRONG,
-//}E_PARSE_USART;
-
 typedef struct
 {
 	uint8_t id;
@@ -60,18 +52,10 @@ typedef struct
 typedef struct
 {
 	DRV_HANDLE usartHandle;
-
 	bool selectedDirection;
 	bool isResponseTimeoutReached;
-
 	uint8_t messageDataTimeout;
-
-	//char receivedMessage[20];
-
-	//uint16_t maxCommands;
-
 	E_ID_MODULES id;
-	//E_Command command;
 	uint8_t parameter;
 }RS485_DATA;
 

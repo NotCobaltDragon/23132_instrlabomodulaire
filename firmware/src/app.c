@@ -137,6 +137,7 @@ void APP_Initialize ( void )
 	appData.receivedCommand = 0;
 	//appData.currentMode = DC_MODE;
 	appData.gainSelect = GAIN_1;
+	appData.gainSelected = 1;
 	appData.canReceiveCommand = true;
 }
 
@@ -188,12 +189,12 @@ void APP_Tasks ( void )
 			//{
 			//	appData.state = APP_STATE_SEND_COMMAND;
 			//}
-			if(appData.flagCooldownReached == true)
-			{
-				RS485_Direction_Mode(RECEIVING);
-				appData.flagCooldownReached = false;
-				appData.canReceiveCommand = true;
-			}
+			//if(appData.flagCooldownReached == true)
+			//{
+			//	RS485_Direction_Mode(RECEIVING);
+			//	appData.flagCooldownReached = false;
+			//	appData.canReceiveCommand = true;
+			//}
 			break;
 		}
 		case APP_STATE_RECEIVE_COMMAND:
@@ -215,11 +216,11 @@ void APP_Tasks ( void )
 						appData.canReceiveCommand = false;
 						//appData.needSendCommand = true;
 						appData.state = APP_STATE_SEND_COMMAND;
+						LED2Off();
 						break;
 					}
 				}
 			}
-			LED2Off();
 			break;
 		}
 
@@ -236,9 +237,10 @@ void APP_Tasks ( void )
 				ClearBuffer(sending.buffer);
 				appData.needSendCommand = false;
 				appData.cmdReadyToSend = false;
-				//appData.canReceiveCommand = true;
+				appData.canReceiveCommand = true;
+				RS485_Direction_Mode(RECEIVING);
 				LED3Off();
-				appData.coolDownActive = true;
+				//appData.coolDownActive = true;
 				appData.state = APP_STATE_SERVICE_TASKS;
 			}
 			break;
@@ -247,19 +249,6 @@ void APP_Tasks ( void )
 		{
 			switch(appData.receivedCommand)
 			{
-				case E_CMD_IDQUESTION:
-					sprintf(sending.buffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], 0);
-					appData.cmdReadyToSend = true;
-					break;
-				case E_CMD_VOLTMGAIN:
-				{
-					sprintf(sending.buffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], appData.receivedParameter);
-					break;
-				}					
-				case E_CMD_VOLTMMODE:
-					sprintf(sending.buffer, "ID%d%s%d", rs485Data.id, cmdData[appData.receivedCommand], appData.receivedParameter);
-					appData.cmdReadyToSend = true;
-					break;
 				case E_CMD_VOLTMREAD:
 				{
 					switch(appData.currentMode)
@@ -278,19 +267,12 @@ void APP_Tasks ( void )
 					appData.valueVolt = 10;
 					appData.valueVoltTenth = 33;
 
-					sprintf(sending.buffer, "ID%d%s%d.%d", rs485Data.id, cmdData[appData.receivedCommand], appData.valueVolt, appData.valueVoltTenth);
-				}
-				default:
-					break;
-			}
-			appData.state = APP_STATE_SERVICE_TASKS;
-			break;
-		}
-		
+					sprintf(sending.buffer, "ID%d%s%d.%d", rs485Data.id, cmdData[appData.receivedCommand], appData.valueVolt, appData.valueVoltTenth);*/
+
 		/* The default state should never be executed. */
 		default:
 		{
-			/* TODO: Handle error in application's state machine. */
+			ErrorHandler();
 			break;
 		}
 	}
@@ -311,9 +293,17 @@ uint8_t GetID()
 
 void InitCommands()
 {
+	//General Commands (GC_xxx)
+	RegisterCommand(GC_GETID_CMD, SendModuleId);
+	//Voltmeter Commands (VM_xxx)
 	RegisterCommand(VM_SET_GAIN_CMD, SetVoltmeterGain);	//VoltMeter Set Gain
 	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode);	//VoltMeter Current Mode
-	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue);	//VoltMeter Read Voltage 
+	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue);	//VoltMeter Read Voltage
+}
+
+void SendModuleId(const char* cmdParameter)
+{
+	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, 23132);
 }
 
 void SetVoltmeterDefault()
@@ -326,49 +316,45 @@ void SetVoltmeterDefault()
 //void SetVoltmeterMode(bool mode)
 void SetVoltmeterMode(const char* cmdParameter)
 {
-	int mode;
-
-	mode = atoi(cmdParameter);
-
-	//convert string/char to a binary value
-	if(mode = 0)
+	if(*cmdParameter == '0')
 	{
 		Relay_AC_Off();
 	}
-	else if(mode = 1)
+	else if(*cmdParameter == '1')
 	{
 		Relay_AC_On();
 	}
-    sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+   sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
 }
 
 //void SetVoltmeterGain(GAIN_SELECT gain)
 void SetVoltmeterGain(const char* cmdParameter)
 {
-	//convert string/char to a numerical value
-	GAIN_SELECT gain = GAIN_1;
-
-	switch(gain)
+	switch(*cmdParameter - '0')
 	{
 		case GAIN_1:
 			Scale_1Off();
 			Scale_2Off();
 			Scale_3Off();
+			appData.gainSelected = 1;
 			break;
 		case GAIN_4:
 			Scale_2Off();
 			Scale_3Off();
 			Scale_1On();
+			appData.gainSelected = 4;
 			break;
 		case GAIN_16:
 			Scale_1Off();
 			Scale_3Off();
 			Scale_2On();
+			appData.gainSelected = 16;
 			break;
 		case GAIN_64:
 			Scale_1Off();
 			Scale_2Off();
 			Scale_3On();
+			appData.gainSelected = 64;
 			break;
 		default:
 			break;
@@ -378,6 +364,8 @@ void SetVoltmeterGain(const char* cmdParameter)
 void ReadVoltmeterValue(const char* cmdParameter)
 {
 
+
+	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, "50.00");
 }
 
 void CoolDownCallback()
@@ -418,20 +406,22 @@ void ErrorHandler()
 
 void ADC_Callback()
 {
-//	static uint8_t counterAdcScan = 0;
-//	counterAdcScan++;
-//
-//	if(counterAdcScan > ADC_SCAN_SPEED)
-//	{
-//		rawResult = ReadAllADC();
-//		static float AN4;
-//		static float AN5;
-//
-//		AN4 = ((float)3/1024) * rawResult.AN4 - 1.5;
-//		AN5 = ((float)3/1024) * rawResult.AN5 - 1.5;
-//
-//		counterAdcScan = 0;
-//	}
+	static uint8_t counterAdcScan = 0;
+	float totalGainFixed = (GAIN_ATTENUATOR * appData.gainSelected * GAIN_RESISTOR_DIVIDER);
+	counterAdcScan++;
+
+	if(counterAdcScan > ADC_SCAN_SPEED)
+	{
+		rawResult = ReadAllADC();
+
+		appData.valueVoltmeterDc = ((float)(rawResult.AN4*((float)V_REF/RES_ADC)*(-1)-(-1.5))/totalGainFixed);
+		//appData.valueVoltmeterAc =
+
+		//AN4 = ((float)3/1024) * rawResult.AN4 - 1.5;
+		//AN5 = ((float)3/1024) * rawResult.AN5 - 1.5;
+
+		counterAdcScan = 0;
+	}
 }
 
 /*******************************************************************************

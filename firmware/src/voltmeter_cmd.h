@@ -7,6 +7,8 @@
 //-----------------------------------------------------------
 #include <string.h>
 
+#define GC_GETID_CMD			"IDID"
+
 #define VM_SET_GAIN_CMD 		"VMSG"
 #define VM_SET_CURRENT_MODE_CMD	"VMCM"
 #define VM_READ_VOLTAGE_CMD		"VMRV"

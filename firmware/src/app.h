@@ -1,21 +1,21 @@
 /*******************************************************************************
-  MPLAB Harmony Application Header File
+	MPLAB Harmony Application Header File
 
-  Company:
-    Microchip Technology Inc.
+	Company:
+		Microchip Technology Inc.
 
-  File Name:
-    app.h
+	File Name:
+		app.h
 
-  Summary:
-    This header file provides prototypes and definitions for the application.
+	Summary:
+		This header file provides prototypes and definitions for the application.
 
-  Description:
-    This header file provides function prototypes and data type definitions for
-    the application.  Some of these are required by the system (such as the
-    "APP_Initialize" and "APP_Tasks" prototypes) and some of them are only used
-    internally by the application (such as the "APP_STATES" definition).  Both
-    are defined here for convenience.
+	Description:
+		This header file provides function prototypes and data type definitions for
+		the application.  Some of these are required by the system (such as the
+		"APP_Initialize" and "APP_Tasks" prototypes) and some of them are only used
+		internally by the application (such as the "APP_STATES" definition).  Both
+		are defined here for convenience.
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -82,15 +82,20 @@ extern "C" {
 #define STATUS_LED_BLINK_SPEED 100 //value in [ms]
 #define COOLDOWN_TIME 100 //value in [ms]
 #define ADC_SCAN_SPEED 10 //value in [ms]
+
+#define V_REF 3 //reference voltage on ADC (pin VREF+)
+#define RES_ADC 1024 //ADC resolution (10bits)
+#define GAIN_ATTENUATOR 0.13  //Gain attenuator
+#define GAIN_RESISTOR_DIVIDER 0.1	//Gain Resistor divider  
 // *****************************************************************************
 /* Application states
 
-  Summary:
-    Application states enumeration
+	Summary:
+		Application states enumeration
 
-  Description:
-    This enumeration defines the valid application states.  These states
-    determine the behavior of the application at various times.
+	Description:
+		This enumeration defines the valid application states.  These states
+		determine the behavior of the application at various times.
 */
 
 typedef enum
@@ -98,63 +103,65 @@ typedef enum
 	/* Application's state machine's initial state. */
 	APP_STATE_INIT=0,
 	APP_STATE_SERVICE_TASKS,
-    APP_STATE_RECEIVE_COMMAND,
-    APP_STATE_SEND_COMMAND,
-    APP_STATE_WAIT,
+		APP_STATE_RECEIVE_COMMAND,
+		APP_STATE_SEND_COMMAND,
+		APP_STATE_WAIT,
 	/* TODO: Define states used by the application state machine. */
 
 } APP_STATES;
 
 typedef enum 
 {
-  DC_MODE = 0,
-  AC_MODE,
+	DC_MODE = 0,
+	AC_MODE,
 } CURRENT_MODE;
 
 typedef enum
 {
-    GAIN_1 = 0,
-    GAIN_4,
-    GAIN_16,
-    GAIN_64,
+		GAIN_1 = 0,
+		GAIN_4,
+		GAIN_16,
+		GAIN_64,
 } GAIN_SELECT;
 // *****************************************************************************
 /* Application Data
 
-  Summary:
-    Holds application data
+	Summary:
+		Holds application data
 
-  Description:
-    This structure holds the application's data.
+	Description:
+		This structure holds the application's data.
 
-  Remarks:
-    Application strings and buffers are be defined outside this structure.
+	Remarks:
+		Application strings and buffers are be defined outside this structure.
  */
 
 typedef struct
 {
-    /* The application's current state */
-    APP_STATES state;
-    uint8_t idValue;
+		/* The application's current state */
+		APP_STATES state;
+		uint8_t idValue;
 
-    bool needSendCommand;
-    bool canReceiveCommand;
-    bool cmdReadyToSend;
-    bool isUsartOpened;
+		bool needSendCommand;
+		bool canReceiveCommand;
+		bool cmdReadyToSend;
+		bool isUsartOpened;
 
-    bool coolDownActive;
-    bool flagCooldownReached;
+		bool coolDownActive;
+		bool flagCooldownReached;
 
-    uint8_t receivedCommand;
-    uint8_t receivedParameter;
+		uint8_t receivedCommand;
+		uint8_t receivedParameter;
 
-    bool currentMode;
-    GAIN_SELECT gainSelect;
+		bool currentMode;
+		GAIN_SELECT gainSelect;
 
-    uint8_t valueVolt;
-    uint8_t valueVoltTenth;
+		float valueVoltmeterDc;
+		float valueVoltmeterAc;
 
-    /* TODO: Define any additional data used by the application. */
+		float gainSelected;
+
+		/* TODO: Define any additional data used by the application. */
 
 } APP_DATA;
 
@@ -174,67 +181,67 @@ typedef struct
 // *****************************************************************************
 
 /*******************************************************************************
-  Function:
-    void APP_Initialize ( void )
+	Function:
+		void APP_Initialize ( void )
 
-  Summary:
-     MPLAB Harmony application initialization routine.
+	Summary:
+		 MPLAB Harmony application initialization routine.
 
-  Description:
-    This function initializes the Harmony application.  It places the 
-    application in its initial state and prepares it to run so that its 
-    APP_Tasks function can be called.
+	Description:
+		This function initializes the Harmony application.  It places the 
+		application in its initial state and prepares it to run so that its 
+		APP_Tasks function can be called.
 
-  Precondition:
-    All other system initialization routines should be called before calling
-    this routine (in "SYS_Initialize").
+	Precondition:
+		All other system initialization routines should be called before calling
+		this routine (in "SYS_Initialize").
 
-  Parameters:
-    None.
+	Parameters:
+		None.
 
-  Returns:
-    None.
+	Returns:
+		None.
 
-  Example:
-    <code>
-    APP_Initialize();
-    </code>
+	Example:
+		<code>
+		APP_Initialize();
+		</code>
 
-  Remarks:
-    This routine must be called from the SYS_Initialize function.
+	Remarks:
+		This routine must be called from the SYS_Initialize function.
 */
 
 void APP_Initialize ( void );
 
 
 /*******************************************************************************
-  Function:
-    void APP_Tasks ( void )
+	Function:
+		void APP_Tasks ( void )
 
-  Summary:
-    MPLAB Harmony Demo application tasks function
+	Summary:
+		MPLAB Harmony Demo application tasks function
 
-  Description:
-    This routine is the Harmony Demo application's tasks function.  It
-    defines the application's state machine and core logic.
+	Description:
+		This routine is the Harmony Demo application's tasks function.  It
+		defines the application's state machine and core logic.
 
-  Precondition:
-    The system and application initialization ("SYS_Initialize") should be
-    called before calling this.
+	Precondition:
+		The system and application initialization ("SYS_Initialize") should be
+		called before calling this.
 
-  Parameters:
-    None.
+	Parameters:
+		None.
 
-  Returns:
-    None.
+	Returns:
+		None.
 
-  Example:
-    <code>
-    APP_Tasks();
-    </code>
+	Example:
+		<code>
+		APP_Tasks();
+		</code>
 
-  Remarks:
-    This routine must be called from SYS_Tasks() routine.
+	Remarks:
+		This routine must be called from SYS_Tasks() routine.
  */
 
 void APP_Tasks(void);
@@ -243,15 +250,14 @@ uint8_t GetID(void);
 
 void InitCommands(void);
 
-//void SetVoltmeterMode(bool mode);
+void SendModuleId(const char* cmdParameter);
+
 void SetVoltmeterMode(const char* cmdParameter);
 
-//void SetVoltmeterGain(GAIN_SELECT gain);
 void SetVoltmeterGain(const char* cmdParameter);
 
 void SetVoltmeterDefault(void);
 
-//void ReadVoltmeterValue(void);
 void ReadVoltmeterValue(const char* cmdParameter);
 
 void StatusLEDCallback(void);

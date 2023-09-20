@@ -50,7 +50,7 @@ bool SendMessage(char txBuffer[RX_TX_BUFFER_SIZE])
 {
 	//bool needSendCommand = true;
 	int nbByteWritten = 0;
-	uint8_t bufferSize = strlen(txBuffer) + 1;
+	uint8_t bufferSize = strlen(txBuffer);
 
 	while(nbByteWritten < bufferSize)
 	{
@@ -87,14 +87,17 @@ bool IdChecker(uint8_t idToCheck)
 
 void ClearBuffer(char* buffer)
 {
+	char dummy;
 	uint8_t clearBufferCounter = 0;
+
+	while(DRV_USART_TRANSFER_STATUS_RECEIVER_DATA_PRESENT & DRV_USART_TransferStatus(rs485Data.usartHandle))
+	{
+		dummy = DRV_USART_ReadByte(rs485Data.usartHandle);
+	}
 	for (clearBufferCounter = 0; clearBufferCounter < RX_TX_BUFFER_SIZE; clearBufferCounter++)
 	{
 		buffer[clearBufferCounter] = '\0';
 	}
-	DRV_USART_Close(rs485Data.usartHandle);
-	while(DRV_USART_CLIENT_STATUS_CLOSED != DRV_USART_ClientStatus(rs485Data.usartHandle));
-	rs485Data.usartHandle = DRV_USART_Open(DRV_USART_INDEX_0, DRV_IO_INTENT_NONBLOCKING);
 }
 
 void ClearReceiveBuffer()

@@ -30,13 +30,6 @@ typedef struct
 	uint16_t AN5;
 }S_RawAdcValues;
 
-typedef struct
-{
-	uint16_t vdc; //Voltage in direct current mode
-	uint16_t vac; //Voltage in alternative current mode
-}S_ConvertedAdcValues;
-
-
 void InitADC(void);
 
 S_RawAdcValues ReadAllADC(void);
