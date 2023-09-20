@@ -80,6 +80,7 @@ extern "C" {
 #define DEFAULT_GAIN 1
 
 #define STATUS_LED_BLINK_SPEED 100 //value in [ms]
+#define COOLDOWN_TIME 100 //value in [ms]
 #define ADC_SCAN_SPEED 10 //value in [ms]
 // *****************************************************************************
 /* Application states
@@ -140,6 +141,9 @@ typedef struct
     bool canReceiveCommand;
     bool cmdReadyToSend;
     bool isUsartOpened;
+
+    bool coolDownActive;
+    bool flagCooldownReached;
 
     uint8_t receivedCommand;
     uint8_t receivedParameter;
@@ -251,6 +255,8 @@ void SetVoltmeterDefault(void);
 void ReadVoltmeterValue(const char* cmdParameter);
 
 void StatusLEDCallback(void);
+
+void CoolDownCallback(void);
 
 void ADC_Callback(void);
 

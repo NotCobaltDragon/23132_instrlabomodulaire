@@ -76,6 +76,7 @@ void __ISR(_TIMER_1_VECTOR, ipl6AUTO) IntHandlerDrvTmrInstance0(void)
 {
 	StatusLEDCallback();
 	MessageDataTimeoutCallback();
+	CoolDownCallback();
 	ADC_Callback();
 	PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
 }

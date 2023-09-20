@@ -158,6 +158,8 @@ void APP_Tasks ( void )
 		/* Application's initial state. */
 		case APP_STATE_INIT:
 		{
+			appData.coolDownActive = false;
+
 			rs485Data.id = GetID();
 
 			SetVoltmeterDefault();
@@ -182,9 +184,15 @@ void APP_Tasks ( void )
 			{
 				appData.state = APP_STATE_RECEIVE_COMMAND;
 			}
-			else if(appData.needSendCommand == true && appData.cmdReadyToSend == true)
+			//else if(appData.needSendCommand == true && appData.cmdReadyToSend == true)
+			//{
+			//	appData.state = APP_STATE_SEND_COMMAND;
+			//}
+			if(appData.flagCooldownReached == true)
 			{
-				appData.state = APP_STATE_SEND_COMMAND;
+				RS485_Direction_Mode(RECEIVING);
+				appData.flagCooldownReached = false;
+				appData.canReceiveCommand = true;
 			}
 			break;
 		}
@@ -194,22 +202,23 @@ void APP_Tasks ( void )
 			LED2On();
 
 			GetMessage(received.buffer);
-			sscanf(received.buffer, "ID%u%4s%s~", &received.id, received.command, received.parameter); //Get individual parameters
-			if(IdChecker(received.id) == true)
+			sscanf(received.buffer, "ID%u%4s%s", &received.id, received.command, received.parameter); //Get individual parameters
+			if(IdChecker(received.id) == true)	//Is the module concerned by the command
 			{
-				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)
+				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)	//Checking for a matching command
 				{
 					if(strcmp(received.command, commandMapping[counter].command) == 0)
 					{
 						commandMapping[counter].cmdFunctionPtr(received.parameter);
+						ClearBuffer(received.buffer);
 						appData.cmdReadyToSend = true;
 						appData.canReceiveCommand = false;
-						appData.needSendCommand = true;
+						//appData.needSendCommand = true;
+						appData.state = APP_STATE_SEND_COMMAND;
 						break;
 					}
 				}
 			}
-			appData.state = APP_STATE_SERVICE_TASKS;
 			LED2Off();
 			break;
 		}
@@ -217,14 +226,21 @@ void APP_Tasks ( void )
 		case APP_STATE_SEND_COMMAND:
 		{
 			LED3On();
-			RS485_Direction_Mode(SENDING);
-			SendMessage(sending.buffer);
-			appData.needSendCommand = false;
-			appData.cmdReadyToSend = false;
-			RS485_Direction_Mode(RECEIVING);
-			appData.canReceiveCommand = true;
-			LED3Off();
-			appData.state = APP_STATE_SERVICE_TASKS;
+			
+			appData.coolDownActive = true;
+			if(appData.flagCooldownReached == true)
+			{
+				appData.flagCooldownReached = false;
+				RS485_Direction_Mode(SENDING);
+				SendMessage(sending.buffer);
+				ClearBuffer(sending.buffer);
+				appData.needSendCommand = false;
+				appData.cmdReadyToSend = false;
+				//appData.canReceiveCommand = true;
+				LED3Off();
+				appData.coolDownActive = true;
+				appData.state = APP_STATE_SERVICE_TASKS;
+			}
 			break;
 		}
 		/*case APP_STATE_APPLY_SETTINGS:
@@ -362,6 +378,24 @@ void SetVoltmeterGain(const char* cmdParameter)
 void ReadVoltmeterValue(const char* cmdParameter)
 {
 
+}
+
+void CoolDownCallback()
+{
+	static uint8_t counterCooldown = 0;
+
+	if(appData.coolDownActive == true)
+		counterCooldown++;
+	else
+		counterCooldown = 0;
+		appData.flagCooldownReached = false;
+
+	if(counterCooldown >= COOLDOWN_TIME)
+	{
+		appData.flagCooldownReached = true;
+		appData.coolDownActive = false;
+		counterCooldown = 0;
+	}
 }
 
 void StatusLEDCallback()

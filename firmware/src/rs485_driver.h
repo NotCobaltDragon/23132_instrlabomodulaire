@@ -91,6 +91,8 @@ uint8_t ExtractCommand(char *rxBuffer);
 
 uint8_t ExtractParameter(char *rxBuffer);
 
+void ClearBuffer(char* buffer);
+
 void MessageDataTimeoutReset(void);
 
 void RS485_Direction_Mode(bool directionMode);
