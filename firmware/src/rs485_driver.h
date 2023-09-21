@@ -14,6 +14,7 @@
 #define DEFAULT_RS485_MODE RECEIVE
 
 #define MAX_NB_COMMANDS 100
+#define MAX_NB_MODULES 15
 
 #define RX_TX_BUFFER_SIZE 16
 
@@ -29,6 +30,12 @@ typedef struct
 	char command[5];	// 4 characters for the cmd + '\0' for NULL
 	void (*cmdFunctionPtr)(const char* cmdParameter);	//Function pointer
 }COMMAND_MAPPING;
+
+typedef struct
+{
+	char parameter[9];
+	void(*moduleTagPtr);
+}MODULE_MAPPING;
 
 typedef enum
 {
@@ -67,7 +74,7 @@ bool GetMessage(char* rxBuffer);
 
 bool RegisterCommand(const char* command, void (*functionPtr)(const char* cmdParameter));
 
-bool IdChecker(uint8_t idToCheck);
+bool IdChecker(uint8_t idToCheck, uint8_t id);
 
 uint8_t ExtractId(char *rxBuffer);
 

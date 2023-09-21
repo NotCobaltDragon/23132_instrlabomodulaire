@@ -11,17 +11,18 @@
 #include <stdint.h>
 // ---------- Constants ---------- //
 #define ADC_SCAN_ADDRESS 0x0030
-#define ADC_RESOLUTION 1023	//10bits
+#define ADC_RESOLUTION 1023	//ADC resolution (10bits - 1)
+#define ADC_SCAN_SPEED 10 //value in [ms]
 
-#define GAIN_R_DIVIDER 0.1
-#define GAIN_ATTENUATOR 0.13
+#define V_REF 3 //reference voltage on ADC (pin VREF+)
 
-#define VREF 3000 //voltage on VREF pin in [mV]
+#define GAIN_RESISTOR_DIVIDER 0.1f	//Gain Resistor divider
+#define GAIN_ATTENUATOR 0.13f  //Gain attenuator 
 
-#define GAIN1 1
-#define GAIN4 4
-#define GAIN16 16
-#define GAIN64 64
+//#define GAIN1 1
+//#define GAIN4 4
+//#define GAIN16 16
+//#define GAIN64 64
 
 // ---------- Structures ---------- //
 typedef struct

@@ -137,7 +137,7 @@ void APP_Initialize ( void )
 	appData.receivedCommand = 0;
 	//appData.currentMode = DC_MODE;
 	appData.gainSelect = GAIN_1;
-	appData.gainSelected = 1;
+	appData.gainSelected = 1.0;
 	appData.canReceiveCommand = true;
 }
 
@@ -204,7 +204,7 @@ void APP_Tasks ( void )
 
 			GetMessage(received.buffer);
 			sscanf(received.buffer, "ID%u%4s%s", &received.id, received.command, received.parameter); //Get individual parameters
-			if(IdChecker(received.id) == true)	//Is the module concerned by the command
+			if(IdChecker(received.id, rs485Data.id) == true)	//Is the module concerned by the command
 			{
 				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)	//Checking for a matching command
 				{
@@ -336,25 +336,25 @@ void SetVoltmeterGain(const char* cmdParameter)
 			Scale_1Off();
 			Scale_2Off();
 			Scale_3Off();
-			appData.gainSelected = 1;
+			appData.gainSelected = 1.0;
 			break;
 		case GAIN_4:
 			Scale_2Off();
 			Scale_3Off();
 			Scale_1On();
-			appData.gainSelected = 4;
+			appData.gainSelected = 4.0;
 			break;
 		case GAIN_16:
 			Scale_1Off();
 			Scale_3Off();
 			Scale_2On();
-			appData.gainSelected = 16;
+			appData.gainSelected = 16.0;
 			break;
 		case GAIN_64:
 			Scale_1Off();
 			Scale_2Off();
 			Scale_3On();
-			appData.gainSelected = 64;
+			appData.gainSelected = 64.0;
 			break;
 		default:
 			break;
@@ -407,14 +407,16 @@ void ErrorHandler()
 void ADC_Callback()
 {
 	static uint8_t counterAdcScan = 0;
-	float totalGainFixed = (GAIN_ATTENUATOR * appData.gainSelected * GAIN_RESISTOR_DIVIDER);
+    float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
+	//float totalGainFixed = (float)(GAIN_ATTENUATOR * (float)appData.gainSelected * GAIN_RESISTOR_DIVIDER);
+    float totalGainFixed = (testFloat * (float)appData.gainSelected);
 	counterAdcScan++;
 
 	if(counterAdcScan > ADC_SCAN_SPEED)
 	{
 		rawResult = ReadAllADC();
 
-		appData.valueVoltmeterDc = ((float)(rawResult.AN4*((float)V_REF/RES_ADC)*(-1)-(-1.5))/totalGainFixed);
+		appData.valueVoltmeterDc = ((rawResult.AN4*(V_REF/ADC_RESOLUTION)*(-1)-(-1.5))/totalGainFixed);
 		//appData.valueVoltmeterAc =
 
 		//AN4 = ((float)3/1024) * rawResult.AN4 - 1.5;

@@ -81,12 +81,7 @@ extern "C" {
 
 #define STATUS_LED_BLINK_SPEED 100 //value in [ms]
 #define COOLDOWN_TIME 100 //value in [ms]
-#define ADC_SCAN_SPEED 10 //value in [ms]
 
-#define V_REF 3 //reference voltage on ADC (pin VREF+)
-#define RES_ADC 1024 //ADC resolution (10bits)
-#define GAIN_ATTENUATOR 0.13  //Gain attenuator
-#define GAIN_RESISTOR_DIVIDER 0.1	//Gain Resistor divider  
 // *****************************************************************************
 /* Application states
 

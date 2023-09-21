@@ -13,6 +13,8 @@ RS485_DATA rs485Data;
 
 COMMAND_MAPPING commandMapping[MAX_NB_COMMANDS];
 
+MODULE_MAPPING moduleMapping[MAX_NB_MODULES];
+
 
 bool Init_RS485(bool defaultDirection)
 {
@@ -43,6 +45,23 @@ bool RegisterCommand(const char* command, void (*functionPtr)(const char* cmdPar
 	else
 	{
 		return false;	//Number of commands created over the limit
+	}
+}
+
+bool RegisterModule(const char* moduleTag, void(*functionPtr))
+{
+	static uint8_t numModules = 0;
+
+	if(numModules < MAX_NB_MODULES)
+	{
+		strcpy(moduleMapping[numModules].parameter, moduleTag);
+		moduleMapping[numModules].moduleTagPtr = functionPtr;
+		numModules++;
+		return true;	//Module Registered
+	}
+	else
+	{
+		return false;	//Number of possible modules exeeded (should never happen)
 	}
 }
 
@@ -77,9 +96,9 @@ bool GetMessage(char* rxBuffer)
 	return true;
 }
 
-bool IdChecker(uint8_t idToCheck)
+bool IdChecker(uint8_t idToCheck, uint8_t id)
 {
-	if(idToCheck == rs485Data.id)
+	if(idToCheck == id)
 		return true;	//Correct ID
 	else
 		return false;	//ID incorrect or not concerned
