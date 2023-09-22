@@ -106,7 +106,7 @@ bool IdChecker(uint8_t idToCheck, uint8_t id)
 
 void ClearBuffer(char* buffer)
 {
-	char dummy;
+	char dummy __attribute__((unused));
 	uint8_t clearBufferCounter = 0;
 
 	while(DRV_USART_TRANSFER_STATUS_RECEIVER_DATA_PRESENT & DRV_USART_TransferStatus(rs485Data.usartHandle))

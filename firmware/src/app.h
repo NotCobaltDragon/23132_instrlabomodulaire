@@ -59,9 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "rs485_driver.h"
-#include "rs485_commands.h"
 #include "voltmeter_cmd.h"
-
 #include "adc_driver.h"
 
 // DOM-IGNORE-BEGIN

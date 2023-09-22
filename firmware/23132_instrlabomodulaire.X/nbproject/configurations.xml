@@ -34,8 +34,8 @@
         </logicalFolder>
         <itemPath>../src/app.h</itemPath>
         <itemPath>../src/adc_driver.h</itemPath>
-        <itemPath>../src/rs485_driver.h</itemPath>
         <itemPath>../src/voltmeter_cmd.h</itemPath>
+        <itemPath>../src/rs485_driver.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -221,7 +221,7 @@
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
       <C32>
-        <property key="additional-warnings" value="false"/>
+        <property key="additional-warnings" value="true"/>
         <property key="addresss-attribute-use" value="false"/>
         <property key="enable-app-io" value="false"/>
         <property key="enable-omit-frame-pointer" value="false"/>
@@ -229,7 +229,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="../src;../src/system_config/default;../src/default;../../../../../framework;../src/system_config/default/framework"/>
+                  value="../src;../src/system_config/default;../src/default;../../../../../framework;../src/system_config/default/framework;..\..\..\2313_libraries"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
@@ -499,8 +499,6 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d03ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/23132_instrlabomodulaire.X/debug/default/23132_instrlabomodulaire_ptg"/>
         <property key="programmerToGoImageName" value="23132_instrlabomodulaire_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
@@ -593,6 +591,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d03ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/microchip/harmony/v2_06/apps/2313_instrlabomodulaire/23132_instrlabomodulaire/firmware/23132_instrlabomodulaire.X/debug/default/23132_instrlabomodulaire_ptg"/>
         <property key="programmerToGoImageName" value="23132_instrlabomodulaire_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

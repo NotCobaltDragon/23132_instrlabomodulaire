@@ -245,30 +245,6 @@ void APP_Tasks ( void )
 			}
 			break;
 		}
-		/*case APP_STATE_APPLY_SETTINGS:
-		{
-			switch(appData.receivedCommand)
-			{
-				case E_CMD_VOLTMREAD:
-				{
-					switch(appData.currentMode)
-					{
-						case DC_MODE:
-							//Read ADC DC
-							//Make conversion
-							break;
-						case AC_MODE:
-							//Read ADC AC
-							//Make converion
-							break;
-						default:
-							break;
-					}
-					appData.valueVolt = 10;
-					appData.valueVoltTenth = 33;
-
-					sprintf(sending.buffer, "ID%d%s%d.%d", rs485Data.id, cmdData[appData.receivedCommand], appData.valueVolt, appData.valueVoltTenth);*/
-
 		/* The default state should never be executed. */
 		default:
 		{
@@ -303,7 +279,7 @@ void InitCommands()
 
 void SendModuleId(const char* cmdParameter)
 {
-	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, 23132);
+	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, "23132");
 }
 
 void SetVoltmeterDefault()
