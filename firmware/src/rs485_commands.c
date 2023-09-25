@@ -15,9 +15,3 @@ const char cmdData[NB_CMD][NB_CHAR_CMD] =
 	"VMM",	//E_CMD_VOLTMMODE
 	"VMR",	//E_CMD_VOLTMREAD
 };
-
-const char nameModulesData[2][12] =	//11 is the maximum characters on screen + 1
-{
-	"Not mounted",
-	"Voltmeter",
-};

@@ -41,6 +41,5 @@ bool GetMessageFromBufferSoft(char* returnBuffer, int length)
 	softwareBuffer.index -= bytesRead;
 	return bytesRead;
 
-
 	return hasBufferData;
 }
