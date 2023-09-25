@@ -117,6 +117,16 @@ typedef enum
 		GAIN_16,
 		GAIN_64,
 } GAIN_SELECT;
+
+//Threshold values for auto gain ajust, values in volts
+#define GAIN_1_MIN_THRSH	20
+#define GAIN_1_MAX_THRSH	110
+#define GAIN_4_MIN_THRSH 	6 
+#define GAIN_4_MAX_THRSH	28
+#define GAIN_16_MIN_THRSH	1.5
+#define GAIN_16_MAX_THRSH	7
+#define GAIN_64_MIN_THRSH	0
+#define GAIN_64_MAX_THRSH	1.8
 // *****************************************************************************
 /* Application Data
 
@@ -153,7 +163,7 @@ typedef struct
 		float valueVoltmeterDc;
 		float valueVoltmeterAc;
 
-		float gainSelected;
+		uint8_t gainSelected;
 
 		/* TODO: Define any additional data used by the application. */
 
@@ -261,6 +271,8 @@ void CoolDownCallback(void);
 void ADC_Callback(void);
 
 void ErrorHandler(void);
+
+float convertRawToVoltage(uint16_t rawResult, uint8_t gainSelected);
 
 
 

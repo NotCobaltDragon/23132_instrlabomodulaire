@@ -137,7 +137,7 @@ void APP_Initialize ( void )
 	appData.receivedCommand = 0;
 	//appData.currentMode = DC_MODE;
 	appData.gainSelect = GAIN_1;
-	appData.gainSelected = 1.0;
+	appData.gainSelected = 1;
 	appData.canReceiveCommand = true;
 }
 
@@ -203,7 +203,7 @@ void APP_Tasks ( void )
 			LED2On();
 
 			GetMessage(received.buffer);
-			sscanf(received.buffer, "ID%u%4s%s", &received.id, received.command, received.parameter); //Get individual parameters
+			sscanf(received.buffer, "ID%u%4s%s", &received.id, received.command, (unsigned int)received.parameter); //Get individual parameters
 			if(IdChecker(received.id, rs485Data.id) == true)	//Is the module concerned by the command
 			{
 				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)	//Checking for a matching command
@@ -220,6 +220,7 @@ void APP_Tasks ( void )
 						break;
 					}
 				}
+				LED2Off();
 			}
 			break;
 		}
@@ -270,11 +271,11 @@ uint8_t GetID()
 void InitCommands()
 {
 	//General Commands (GC_xxx)
-	RegisterCommand(GC_GETID_CMD, SendModuleId);
+	//RegisterCommand(GC_GETID_CMD, SendModuleId);
 	//Voltmeter Commands (VM_xxx)
 	RegisterCommand(VM_SET_GAIN_CMD, SetVoltmeterGain);	//VoltMeter Set Gain
-	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode);	//VoltMeter Current Mode
 	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue);	//VoltMeter Read Voltage
+	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode);	//VoltMeter Current Mode
 }
 
 void SendModuleId(const char* cmdParameter)
@@ -306,42 +307,62 @@ void SetVoltmeterMode(const char* cmdParameter)
 //void SetVoltmeterGain(GAIN_SELECT gain)
 void SetVoltmeterGain(const char* cmdParameter)
 {
-	switch(*cmdParameter - '0')
+	UpdateAnalogGain(*cmdParameter - '0');
+	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+}
+
+void ReadVoltmeterValue(const char* cmdParameter)
+{
+	switch(appData.gainSelected)
 	{
-		case GAIN_1:
-			Scale_1Off();
-			Scale_2Off();
-			Scale_3Off();
-			appData.gainSelected = 1.0;
+		case 1:
+			sprintf(sending.buffer, "ID%d%s%3.1f", rs485Data.id, received.command, appData.valueVoltmeterDc);
 			break;
-		case GAIN_4:
-			Scale_2Off();
-			Scale_3Off();
-			Scale_1On();
-			appData.gainSelected = 4.0;
+		case 4:
+			sprintf(sending.buffer, "ID%d%s%2.2f", rs485Data.id, received.command, appData.valueVoltmeterDc);
 			break;
-		case GAIN_16:
-			Scale_1Off();
-			Scale_3Off();
-			Scale_2On();
-			appData.gainSelected = 16.0;
+		case 16:
+			sprintf(sending.buffer, "ID%d%s%1.3f", rs485Data.id, received.command, appData.valueVoltmeterDc);
 			break;
-		case GAIN_64:
-			Scale_1Off();
-			Scale_2Off();
-			Scale_3On();
-			appData.gainSelected = 64.0;
+		case 64:
+			sprintf(sending.buffer, "ID%d%s%1.3f", rs485Data.id, received.command, appData.valueVoltmeterDc);
 			break;
 		default:
 			break;
 	}
 }
 
-void ReadVoltmeterValue(const char* cmdParameter)
+UpdateAnalogGain(uint8_t setGain)
 {
-
-
-	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, "50.00");
+	switch(setGain)
+	{
+		case GAIN_1:
+			Scale_1Off();
+			Scale_2Off();
+			Scale_3Off();
+			appData.gainSelected = 1;
+			break;
+		case GAIN_4:
+			Scale_2Off();
+			Scale_3Off();
+			Scale_1On();
+			appData.gainSelected = 4;
+			break;
+		case GAIN_16:
+			Scale_1Off();
+			Scale_3Off();
+			Scale_2On();
+			appData.gainSelected = 16;
+			break;
+		case GAIN_64:
+			Scale_1Off();
+			Scale_2Off();
+			Scale_3On();
+			appData.gainSelected = 64;
+			break;
+		default:
+			break;
+	}
 }
 
 void CoolDownCallback()
@@ -383,22 +404,55 @@ void ErrorHandler()
 void ADC_Callback()
 {
 	static uint8_t counterAdcScan = 0;
-    float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
+    //float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
 	//float totalGainFixed = (float)(GAIN_ATTENUATOR * (float)appData.gainSelected * GAIN_RESISTOR_DIVIDER);
-    float totalGainFixed = (testFloat * (float)appData.gainSelected);
-	counterAdcScan++;
+    //float totalGainFixed = (testFloat * (float)appData.gainSelected);
 
 	if(counterAdcScan > ADC_SCAN_SPEED)
 	{
 		rawResult = ReadAllADC();
 
-		appData.valueVoltmeterDc = ((rawResult.AN4*(V_REF/ADC_RESOLUTION)*(-1)-(-1.5))/totalGainFixed);
+		appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
+
+		//appData.valueVoltmeterDc = ((rawResult.AN4*(V_REF/ADC_RESOLUTION)*(-1)-(-1.5))/totalGainFixed);
 		//appData.valueVoltmeterAc =
 
 		//AN4 = ((float)3/1024) * rawResult.AN4 - 1.5;
 		//AN5 = ((float)3/1024) * rawResult.AN5 - 1.5;
 
+
 		counterAdcScan = 0;
+	}
+	else
+	{
+		counterAdcScan++;
+	}
+}
+
+float convertRawToVoltage(uint16_t rawResult, uint8_t gainSelected)
+{
+	float convertedValue = 0.00;
+
+	convertedValue = (float)rawResult * ((float)V_REF/(float)ADC_RESOLUTION);
+	convertedValue -= 1.5;
+	convertedValue /= 0.013;
+	convertedValue /= (float)gainSelected;
+
+	return convertedValue;
+}
+
+void AutoGainSelect()
+{
+	switch(appData.gainSelected)
+	{
+		case 1:
+			break;
+		case 4:
+			break;
+		case 16:
+			break;
+		case 64:
+			break;
 	}
 }
 

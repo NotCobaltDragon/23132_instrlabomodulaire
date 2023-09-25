@@ -86,6 +86,8 @@ void ClearBuffer(char* buffer);
 
 void MessageDataTimeoutReset(void);
 
+void MessageDataTimeoutCallback(void);
+
 void RS485_Direction_Mode(bool directionMode);
 
 void RS485_Sending_Mode(void);

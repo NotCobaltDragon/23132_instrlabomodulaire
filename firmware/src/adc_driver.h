@@ -11,7 +11,7 @@
 #include <stdint.h>
 // ---------- Constants ---------- //
 #define ADC_SCAN_ADDRESS 0x0030
-#define ADC_RESOLUTION 1023	//ADC resolution (10bits - 1)
+#define ADC_RESOLUTION 1024	//ADC resolution (10bits - 1)
 #define ADC_SCAN_SPEED 10 //value in [ms]
 
 #define V_REF 3 //reference voltage on ADC (pin VREF+)
