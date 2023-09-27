@@ -136,7 +136,7 @@ void APP_Initialize ( void )
 	appData.idValue = 0;
 	appData.receivedCommand = 0;
 	//appData.currentMode = DC_MODE;
-	appData.gainSelect = GAIN_1;
+	appData.gainSelectEnum = GAIN_1;
 	appData.gainSelected = 1;
 	appData.canReceiveCommand = true;
 }
@@ -270,9 +270,9 @@ uint8_t GetID()
 
 void InitCommands()
 {
-	//General Commands (GC_xxx)
-	//RegisterCommand(GC_GETID_CMD, SendModuleId);
-	//Voltmeter Commands (VM_xxx)
+	//  General Commands (GC_xxx)
+	RegisterCommand(GC_GETID_CMD, SendModuleId);	//Send module ID
+	//  Voltmeter Commands (VM_xxx)
 	RegisterCommand(VM_SET_GAIN_CMD, SetVoltmeterGain);	//VoltMeter Set Gain
 	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue);	//VoltMeter Read Voltage
 	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode);	//VoltMeter Current Mode
@@ -293,22 +293,46 @@ void SetVoltmeterDefault()
 //void SetVoltmeterMode(bool mode)
 void SetVoltmeterMode(const char* cmdParameter)
 {
-	if(*cmdParameter == '0')
+	switch(*cmdParameter)
+	{
+		case '0':
+			Relay_AC_Off();
+			appData.modeSelected = 0;
+			sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+		break;
+		case '1':
+			Relay_AC_On();
+			appData.modeSelected = 1;
+			sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+		break;
+		case '?':
+			sprintf(sending.buffer, "ID%d%s%u", rs485Data.id, received.command, appData.modeSelected);
+		break;
+		default:
+		break; 
+	}
+	/*if(*cmdParameter == '0')
 	{
 		Relay_AC_Off();
 	}
 	else if(*cmdParameter == '1')
 	{
 		Relay_AC_On();
-	}
-   sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+	}*/
 }
 
 //void SetVoltmeterGain(GAIN_SELECT gain)
 void SetVoltmeterGain(const char* cmdParameter)
 {
-	UpdateAnalogGain(*cmdParameter - '0');
-	sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+	if(*cmdParameter != '?')
+	{
+		sprintf(sending.buffer, "ID%d%s%s", rs485Data.id, received.command, received.parameter);
+		UpdateAnalogGain(*cmdParameter - '0');
+	}
+	else if(*cmdParameter == '?')
+	{
+		sprintf(sending.buffer, "ID%d%s%u", rs485Data.id, received.command, appData.gainSelected);
+	}
 }
 
 void ReadVoltmeterValue(const char* cmdParameter)
@@ -316,16 +340,16 @@ void ReadVoltmeterValue(const char* cmdParameter)
 	switch(appData.gainSelected)
 	{
 		case 1:
-			sprintf(sending.buffer, "ID%d%s%3.1f", rs485Data.id, received.command, appData.valueVoltmeterDc);
+			sprintf(sending.buffer, "ID%d%3.1f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
 		case 4:
-			sprintf(sending.buffer, "ID%d%s%2.2f", rs485Data.id, received.command, appData.valueVoltmeterDc);
+			sprintf(sending.buffer, "ID%d%2.2f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
 		case 16:
-			sprintf(sending.buffer, "ID%d%s%1.3f", rs485Data.id, received.command, appData.valueVoltmeterDc);
+			sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
 		case 64:
-			sprintf(sending.buffer, "ID%d%s%1.3f", rs485Data.id, received.command, appData.valueVoltmeterDc);
+			sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
 		default:
 			break;
@@ -363,6 +387,7 @@ UpdateAnalogGain(uint8_t setGain)
 		default:
 			break;
 	}
+	appData.gainSelectEnum = setGain;
 }
 
 void CoolDownCallback()
@@ -404,9 +429,9 @@ void ErrorHandler()
 void ADC_Callback()
 {
 	static uint8_t counterAdcScan = 0;
-    //float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
+  //float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
 	//float totalGainFixed = (float)(GAIN_ATTENUATOR * (float)appData.gainSelected * GAIN_RESISTOR_DIVIDER);
-    //float totalGainFixed = (testFloat * (float)appData.gainSelected);
+  //float totalGainFixed = (testFloat * (float)appData.gainSelected);
 
 	if(counterAdcScan > ADC_SCAN_SPEED)
 	{
@@ -437,6 +462,7 @@ float convertRawToVoltage(uint16_t rawResult, uint8_t gainSelected)
 	convertedValue -= 1.5;
 	convertedValue /= 0.013;
 	convertedValue /= (float)gainSelected;
+	convertedValue = -convertedValue;
 
 	return convertedValue;
 }

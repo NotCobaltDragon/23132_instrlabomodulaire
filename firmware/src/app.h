@@ -158,12 +158,13 @@ typedef struct
 		uint8_t receivedParameter;
 
 		bool currentMode;
-		GAIN_SELECT gainSelect;
+		GAIN_SELECT gainSelectEnum;
 
 		float valueVoltmeterDc;
 		float valueVoltmeterAc;
 
 		uint8_t gainSelected;
+		uint8_t modeSelected;
 
 		/* TODO: Define any additional data used by the application. */
 
@@ -273,6 +274,8 @@ void ADC_Callback(void);
 void ErrorHandler(void);
 
 float convertRawToVoltage(uint16_t rawResult, uint8_t gainSelected);
+
+void UpdateAnalogGain(uint8_t setGain);
 
 
 
