@@ -185,10 +185,6 @@ void APP_Tasks ( void )
 			{
 				appData.state = APP_STATE_RECEIVE_COMMAND;
 			}
-			//else if(appData.needSendCommand == true && appData.cmdReadyToSend == true)
-			//{
-			//	appData.state = APP_STATE_SEND_COMMAND;
-			//}
 			//if(appData.flagCooldownReached == true)
 			//{
 			//	RS485_Direction_Mode(RECEIVING);
@@ -356,7 +352,7 @@ void ReadVoltmeterValue(const char* cmdParameter)
 	}
 }
 
-UpdateAnalogGain(uint8_t setGain)
+void UpdateAnalogGain(uint8_t setGain)
 {
 	switch(setGain)
 	{
@@ -439,13 +435,19 @@ void ADC_Callback()
 
 		appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
 
+		while(AutoGainSelect()==true)
+		{
+			rawResult = ReadAllADC();
+			appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
+		}
+
 		//appData.valueVoltmeterDc = ((rawResult.AN4*(V_REF/ADC_RESOLUTION)*(-1)-(-1.5))/totalGainFixed);
 		//appData.valueVoltmeterAc =
 
 		//AN4 = ((float)3/1024) * rawResult.AN4 - 1.5;
 		//AN5 = ((float)3/1024) * rawResult.AN5 - 1.5;
 
-
+		
 		counterAdcScan = 0;
 	}
 	else
@@ -467,19 +469,60 @@ float convertRawToVoltage(uint16_t rawResult, uint8_t gainSelected)
 	return convertedValue;
 }
 
-void AutoGainSelect()
+bool AutoGainSelect()
 {
 	switch(appData.gainSelected)
 	{
 		case 1:
+		{
+			if(appData.valueVoltmeterDc < GAIN_1_MIN_THRSH)
+			{
+				UpdateAnalogGain(GAIN_4);
+				return true;
+			}
 			break;
+		}
 		case 4:
+		{
+			if(appData.valueVoltmeterDc < GAIN_4_MIN_THRSH)
+			{
+				UpdateAnalogGain(GAIN_16);
+				return true;
+			}
+			else if(appData.valueVoltmeterDc > GAIN_4_MAX_THRSH)
+			{
+				UpdateAnalogGain(GAIN_1);
+				return true;
+			}
 			break;
+		}
 		case 16:
+		{
+			if(appData.valueVoltmeterDc < GAIN_16_MIN_THRSH)
+			{
+				UpdateAnalogGain(GAIN_64);
+				return true;
+			}
+			else if(appData.valueVoltmeterDc > GAIN_16_MAX_THRSH)
+			{
+				UpdateAnalogGain(GAIN_4);
+				return true;
+			}
 			break;
+		}
 		case 64:
+		{
+			if(appData.valueVoltmeterDc > GAIN_64_MAX_THRSH)
+			{
+				UpdateAnalogGain(GAIN_16);
+				return true;
+			}
+			break;
+		}
+		default:
 			break;
 	}
+	return false;
 }
 
 /*******************************************************************************

@@ -59,7 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "rs485_driver.h"
-#include "../../../23132_instrlabomodulaire/firmware/src/rs485_commands.h"
+//#include "../../../23132_instrlabomodulaire/firmware/src/rs485_commands.h"
 #include "voltmeter_cmd.h"
 #include "adc_driver.h"
 
@@ -270,6 +270,10 @@ void StatusLEDCallback(void);
 void CoolDownCallback(void);
 
 void ADC_Callback(void);
+
+void UpdateAnalogGain(uint8_t setGain);
+
+bool AutoGainSelect(void);
 
 void ErrorHandler(void);
 

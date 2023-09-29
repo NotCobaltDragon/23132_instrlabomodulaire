@@ -77,6 +77,7 @@ bool SendMessage(char txBuffer[RX_TX_BUFFER_SIZE])
 		if(!DRV_USART_TransmitBufferIsFull(rs485Data.usartHandle))
 			DRV_USART_WriteByte(rs485Data.usartHandle, txBuffer[nbByteWritten++]);
 	}
+	DRV_USART_WriteByte(rs485Data.usartHandle, '\0');
 	while(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_EMPTY & DRV_USART_TransferStatus(rs485Data.usartHandle))){}
 	return false;
 }
