@@ -79,7 +79,7 @@ extern "C" {
 #define DEFAULT_GAIN 1
 
 #define STATUS_LED_BLINK_SPEED 100 //value in [ms]
-#define COOLDOWN_TIME 100 //value in [ms]
+#define COOLDOWN_TIME 200 //value in [ms]
 
 // *****************************************************************************
 /* Application states

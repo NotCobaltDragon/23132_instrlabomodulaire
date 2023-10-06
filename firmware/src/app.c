@@ -1,16 +1,16 @@
 /*******************************************************************************
-  MPLAB Harmony Application Source File
-  
-  Company:
+	MPLAB Harmony Application Source File
+	
+	Company:
 	Microchip Technology Inc.
-  
-  File Name:
+	
+	File Name:
 	app.c
 
-  Summary:
+	Summary:
 	This file contains the source code for the MPLAB Harmony application.
 
-  Description:
+	Description:
 	This file contains the source code for the MPLAB Harmony application.  It 
 	implements the logic of the application's state machine and it may call 
 	API routines of other MPLAB Harmony modules in the system, such as drivers,
@@ -64,13 +64,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 /* Application Data
 
-  Summary:
+	Summary:
 	Holds application data
 
-  Description:
+	Description:
 	This structure holds the application's data.
 
-  Remarks:
+	Remarks:
 	This structure should be initialized by the APP_Initialize function.
 	
 	Application strings and buffers are be defined outside this structure.
@@ -122,10 +122,10 @@ S_RawAdcValues converted;
 // *****************************************************************************
 
 /*******************************************************************************
-  Function:
+	Function:
 	void APP_Initialize ( void )
 
-  Remarks:
+	Remarks:
 	See prototype in app.h.
  */
 
@@ -143,10 +143,10 @@ void APP_Initialize ( void )
 
 
 /******************************************************************************
-  Function:
+	Function:
 	void APP_Tasks ( void )
 
-  Remarks:
+	Remarks:
 	See prototype in app.h.
  */
 
@@ -187,9 +187,9 @@ void APP_Tasks ( void )
 			}
 			//if(appData.flagCooldownReached == true)
 			//{
-			//	RS485_Direction_Mode(RECEIVING);
-			//	appData.flagCooldownReached = false;
-			//	appData.canReceiveCommand = true;
+			//  RS485_Direction_Mode(RECEIVING);
+			//  appData.flagCooldownReached = false;
+			//  appData.canReceiveCommand = true;
 			//}
 			break;
 		}
@@ -200,9 +200,9 @@ void APP_Tasks ( void )
 
 			GetMessage(received.buffer);
 			sscanf(received.buffer, "ID%u%4s%s", &received.id, received.command, (unsigned int)received.parameter); //Get individual parameters
-			if(IdChecker(received.id, rs485Data.id) == true)	//Is the module concerned by the command
+			if(IdChecker(received.id, rs485Data.id) == true)  //Is the module concerned by the command
 			{
-				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)	//Checking for a matching command
+				for(counter = 0; counter < MAX_NB_COMMANDS; counter++)  //Checking for a matching command
 				{
 					if(strcmp(received.command, commandMapping[counter].command) == 0)
 					{
@@ -253,25 +253,25 @@ void APP_Tasks ( void )
 
 uint8_t GetID()
 {
-    uint8_t idValue = 0;
+		uint8_t idValue = 0;
 
-    // Read each ID pin and construct the 4-bit value
-    idValue |= (ID_8StateGet() & 0x01) << 3;
-    idValue |= (ID_4StateGet() & 0x01) << 2;
-    idValue |= (ID_2StateGet() & 0x01) << 1;
-    idValue |= (ID_1StateGet() & 0x01) << 0;
+		// Read each ID pin and construct the 4-bit value
+		idValue |= (ID_8StateGet() & 0x01) << 3;
+		idValue |= (ID_4StateGet() & 0x01) << 2;
+		idValue |= (ID_2StateGet() & 0x01) << 1;
+		idValue |= (ID_1StateGet() & 0x01) << 0;
 
-    return idValue;
+		return idValue;
 }
 
 void InitCommands()
 {
 	//  General Commands (GC_xxx)
-	RegisterCommand(GC_GETID_CMD, SendModuleId);	//Send module ID
+	RegisterCommand(GC_GETID_CMD, SendModuleId);  //Send module ID
 	//  Voltmeter Commands (VM_xxx)
-	RegisterCommand(VM_SET_GAIN_CMD, SetVoltmeterGain);	//VoltMeter Set Gain
-	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue);	//VoltMeter Read Voltage
-	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode);	//VoltMeter Current Mode
+	RegisterCommand(VM_SET_GAIN_CMD, SetVoltmeterGain); //VoltMeter Set Gain
+	RegisterCommand(VM_READ_VOLTAGE_CMD, ReadVoltmeterValue); //VoltMeter Read Voltage
+	RegisterCommand(VM_SET_CURRENT_MODE_CMD, SetVoltmeterMode); //VoltMeter Current Mode
 }
 
 void SendModuleId(const char* cmdParameter)
@@ -283,7 +283,7 @@ void SetVoltmeterDefault()
 {
 	Relay_AC_Off();
 
-	//SetVoltmeterGain(DEFAULT_GAIN);	//Minimum gain
+	//SetVoltmeterGain(DEFAULT_GAIN); //Minimum gain
 }
 
 //void SetVoltmeterMode(bool mode)
@@ -336,17 +336,37 @@ void ReadVoltmeterValue(const char* cmdParameter)
 	switch(appData.gainSelected)
 	{
 		case 1:
-			sprintf(sending.buffer, "ID%d%3.1f", rs485Data.id, appData.valueVoltmeterDc);
+		{
+			if(appData.valueVoltmeterDc>=0)
+				sprintf(sending.buffer, "ID%d%3.1f", rs485Data.id, appData.valueVoltmeterDc);
+			else
+				sprintf(sending.buffer, "ID%d%2.1f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
+		}
 		case 4:
-			sprintf(sending.buffer, "ID%d%2.2f", rs485Data.id, appData.valueVoltmeterDc);
+		{
+			if(appData.valueVoltmeterDc>=0)
+				sprintf(sending.buffer, "ID%d%2.2f", rs485Data.id, appData.valueVoltmeterDc);
+			else
+				sprintf(sending.buffer, "ID%d%2.1f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
+		}
 		case 16:
-			sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
+		{
+			if(appData.valueVoltmeterDc>=0)
+				sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
+			else
+				sprintf(sending.buffer, "ID%d%1.2f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
+		}
 		case 64:
-			sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
+		{
+			if(appData.valueVoltmeterDc>=0)
+				sprintf(sending.buffer, "ID%d%1.3f", rs485Data.id, appData.valueVoltmeterDc);
+			else
+				sprintf(sending.buffer, "ID%d%1.2f", rs485Data.id, appData.valueVoltmeterDc);
 			break;
+		}
 		default:
 			break;
 	}
@@ -425,9 +445,9 @@ void ErrorHandler()
 void ADC_Callback()
 {
 	static uint8_t counterAdcScan = 0;
-  //float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
+	//float testFloat = (float)(GAIN_ATTENUATOR * GAIN_RESISTOR_DIVIDER);
 	//float totalGainFixed = (float)(GAIN_ATTENUATOR * (float)appData.gainSelected * GAIN_RESISTOR_DIVIDER);
-  //float totalGainFixed = (testFloat * (float)appData.gainSelected);
+	//float totalGainFixed = (testFloat * (float)appData.gainSelected);
 
 	if(counterAdcScan > ADC_SCAN_SPEED)
 	{
@@ -435,11 +455,11 @@ void ADC_Callback()
 
 		appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
 
-		while(AutoGainSelect()==true)
-		{
-			rawResult = ReadAllADC();
-			appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
-		}
+		//while(AutoGainSelect()==true)
+		//{
+		//  rawResult = ReadAllADC();
+		//  appData.valueVoltmeterDc = convertRawToVoltage(rawResult.AN4, appData.gainSelected);
+		//}
 
 		//appData.valueVoltmeterDc = ((rawResult.AN4*(V_REF/ADC_RESOLUTION)*(-1)-(-1.5))/totalGainFixed);
 		//appData.valueVoltmeterAc =
